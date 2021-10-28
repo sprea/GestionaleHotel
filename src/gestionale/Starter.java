@@ -1,10 +1,15 @@
 package gestionale;
 
 import java.io.BufferedReader;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,6 +18,51 @@ import java.util.List;
 
 public class Starter 
 {
+	public static void SaveData(List<Prenotazione> Prenotazioni)
+	{
+		Gson gson = new Gson();
+		
+		String json = gson.toJson(Prenotazioni);
+		
+		File restore = new File("restore.json");	
+		
+		try {
+			FileWriter fw = new FileWriter(restore);
+			
+			fw.write(json);
+			
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static List<Prenotazione> RestoreData(String restoreFilePath)
+	{
+		File restore = new File(restoreFilePath);
+		if(restore.exists() == false)
+		{
+			try {
+				restore.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		Gson gson = new Gson();
+		String json = new String();	
+		try {
+			json = new String(Files.readAllBytes(Paths.get(restoreFilePath)));
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		Type listType = new TypeToken<ArrayList<Prenotazione>>() {}.getType();
+		List<Prenotazione> Prenotazioni = gson.fromJson(json, listType);
+		
+		return Prenotazioni;
+	}
+	
 	
 	public static void Menu()
 	{
@@ -30,11 +80,19 @@ public class Starter
 
 	public static void main(String[] args) throws NumberFormatException, IOException, ParseException 
 	{
+		
+		
 		BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
 		Integer scelta;
 		
 		List<Prenotazione> Prenotazioni = new ArrayList<Prenotazione>();
 		List<Cliente> Clienti = new ArrayList<Cliente>();
+		
+		File restoreFile = new File("restore.json");
+		if(restoreFile.length() > 0)
+		{
+			Prenotazioni = Starter.RestoreData("./restore.json");
+		}
 		
 		do
 		{
@@ -101,7 +159,7 @@ public class Starter
 					if(arrivo.compareTo(termine) >= 0)
 						System.out.println("Inserimento date non corretto");
 					
-				}while(arrivo.compareTo(termine) >= 0);		//se la data di arrivo è "maggiore" di quella di termine errore
+				}while(arrivo.compareTo(termine) >= 0);		//se la data di arrivo ï¿½ "maggiore" di quella di termine errore
 				
 				Prenotazione nuova = new Prenotazione(cliente, camera, arrivo, termine);
 				
@@ -204,6 +262,9 @@ public class Starter
 			}
 			
 		}while(scelta != 6);
+		
+		Starter.SaveData(Prenotazioni);
+		
 	}
 
 }
