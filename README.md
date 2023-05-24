@@ -13,3 +13,16 @@ Project developed using the object-oriented paradigm written in Java
 3. Run in eclipse
 
 ## Usage
+
+![Main Menu](/images/running.gif)
+
+### List of reservations
+
+![List reservations](/images/a.jpg)
+
+### List of client
+
+![List clients](/images/b.jpg)
+
+## License
+Gnu General Public License Version 3 (GPL V3)
